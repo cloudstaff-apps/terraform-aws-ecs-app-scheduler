@@ -1,27 +1,35 @@
 resource "aws_ecs_task_definition" "default" {
+  count  = var.image != "" ? 1 : 0
   family = "${var.cluster_name}-${var.name}"
 
   execution_role_arn = var.task_role_arn
   task_role_arn      = var.task_role_arn
 
-  container_definitions = <<EOT
-[
-  {
-    "name": "${var.name}",
-    "image": "${var.image}",
-    "command": ["echo","${var.cluster_name}: ECS scheduled task"],
-    "cpu": ${var.cpu},
-    "memory": ${var.memory},
-    "essential": true,
-    "logConfiguration": {
-      "logDriver": "awslogs",
-      "options": {
-          "awslogs-group": "${aws_cloudwatch_log_group.default.name}",
-          "awslogs-region": "${data.aws_region.current.name}",
-          "awslogs-stream-prefix": "${var.name}"
+  requires_compatibilities = [var.launch_type]
+
+  network_mode = var.launch_type == "FARGATE" ? "awsvpc" : var.network_mode
+  cpu          = var.launch_type == "FARGATE" ? var.cpu : null
+  memory       = var.launch_type == "FARGATE" ? var.memory : null
+
+  container_definitions = jsonencode([
+    {
+      name      = var.name
+      image     = var.image
+      command   = var.command
+      cpu       = var.cpu
+      memory    = var.memory
+      essential = true
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = aws_cloudwatch_log_group.default.name
+          awslogs-region        = data.aws_region.current.name
+          awslogs-stream-prefix = "app"
+        }
       }
+      secrets     = [for k, v in var.ssm_variables : { name : k, valueFrom : v }]
+      environment = [for k, v in var.static_variables : { name : k, value : v }]
+      ulimits     = var.ulimits
     }
-  }
-]
-EOT
+  ])
 }

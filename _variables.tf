@@ -53,6 +53,11 @@ variable "launch_type" {
   description = "Instance type. Fargate allowed"
 }
 
+variable "network_mode" {
+  default     = null
+  description = "The Docker networking mode to use for the containers in the task. The valid values are none, bridge, awsvpc, and host. (REQUIRED IF 'LAUNCH_TYPE' IS FARGATE)"
+}
+
 variable "schedule_expression" {
   description = "Cron expression"
 }
@@ -66,4 +71,32 @@ variable "event_description" {
 }
 
 variable "account_id" {
+}
+
+variable "ssm_variables" {
+  type        = map(string)
+  description = "Map of variables and SSM locations to add to the task definition"
+  default     = {}
+}
+
+variable "static_variables" {
+  type        = map(string)
+  description = "Map of variables and static values to add to the task definition"
+  default     = {}
+}
+
+variable "ulimits" {
+  type = list(object({
+    name      = string
+    hardLimit = number
+    softLimit = number
+  }))
+  description = "Container ulimit settings. This is a list of maps, where each map should contain \"name\", \"hardLimit\" and \"softLimit\""
+  default     = null
+}
+
+variable "command" {
+  type        = list(string)
+  default     = null
+  description = "The command passed to the container, exec form (e.g. [\"node\", \"dist/scripts/run.js\"]). Overrides the Docker image's default CMD. Leave unset to use the image's default command."
 }
