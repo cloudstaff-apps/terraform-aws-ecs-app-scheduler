@@ -144,3 +144,55 @@ Module managed by [DNX Solutions](https://github.com/DNXLabs).
 ## License
 
 Apache 2 Licensed. See [LICENSE](https://github.com/DNXLabs/terraform-aws-ecs-app-scheduler/blob/master/LICENSE) for full details.
+
+<!-- BEGIN_TF_DOCS -->
+## Modules
+
+No modules.
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [aws_ecs_cluster.ecs_apps](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ecs_cluster) | data source |
+| [aws_iam_policy.ecs_events](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy) | data source |
+| [aws_iam_policy_document.ecs_events_assume_role_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_region.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_account_id"></a> [account\_id](#input\_account\_id) | n/a | `any` | n/a | yes |
+| <a name="input_cloudwatch_logs_export"></a> [cloudwatch\_logs\_export](#input\_cloudwatch\_logs\_export) | Whether to mark the log group to export to an S3 bucket (needs terraform-aws-log-exporter to be deployed in the account/region) | `bool` | `false` | no |
+| <a name="input_cloudwatch_logs_retention"></a> [cloudwatch\_logs\_retention](#input\_cloudwatch\_logs\_retention) | Specifies the number of days you want to retain log events in the specified log group. Possible values are: 1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1827, and 3653. | `number` | `120` | no |
+| <a name="input_cluster_name"></a> [cluster\_name](#input\_cluster\_name) | n/a | `string` | `"Name of existing ECS Cluster to deploy this app to"` | no |
+| <a name="input_command"></a> [command](#input\_command) | The command passed to the container, exec form (e.g. ["node", "dist/scripts/run.js"]). Overrides the Docker image's default CMD. Leave unset to use the image's default command. | `list(string)` | `null` | no |
+| <a name="input_cpu"></a> [cpu](#input\_cpu) | Hard limit for CPU for the container | `string` | `"0"` | no |
+| <a name="input_efs_access_point_gid"></a> [efs\_access\_point\_gid](#input\_efs\_access\_point\_gid) | Owner gid of the access point root directory. | `number` | `0` | no |
+| <a name="input_efs_access_point_path"></a> [efs\_access\_point\_path](#input\_efs\_access\_point\_path) | Root directory on the EFS filesystem for this service's access point. Defaults to /<name>. Set it explicitly when several services must share one directory - two services pointing at the same path see the same files. | `string` | `null` | no |
+| <a name="input_efs_access_point_permissions"></a> [efs\_access\_point\_permissions](#input\_efs\_access\_point\_permissions) | POSIX permissions applied to the access point root directory. | `string` | `"755"` | no |
+| <a name="input_efs_access_point_uid"></a> [efs\_access\_point\_uid](#input\_efs\_access\_point\_uid) | Owner uid of the access point root directory. The default of 0 makes the mount read-only for a container running as a non-root user; set it to that user's uid when the container has to write. | `number` | `0` | no |
+| <a name="input_efs_mapping"></a> [efs\_mapping](#input\_efs\_mapping) | A map of EFS filesystem ids to container mount paths, e.g. { fs-0abc123 = "/opt/airflow/custom\_config" }. Leave empty for no EFS volumes. | `map(string)` | `{}` | no |
+| <a name="input_event_description"></a> [event\_description](#input\_event\_description) | n/a | `string` | `"ECS task"` | no |
+| <a name="input_iam_path"></a> [iam\_path](#input\_iam\_path) | n/a | `string` | `"/"` | no |
+| <a name="input_image"></a> [image](#input\_image) | Docker image to deploy (can be a placeholder) | `string` | `"alpine:latest"` | no |
+| <a name="input_launch_type"></a> [launch\_type](#input\_launch\_type) | Instance type. Fargate allowed | `string` | `"EC2"` | no |
+| <a name="input_memory"></a> [memory](#input\_memory) | Hard memory of the container | `string` | `"512"` | no |
+| <a name="input_name"></a> [name](#input\_name) | Name of your ECS service | `any` | n/a | yes |
+| <a name="input_network_mode"></a> [network\_mode](#input\_network\_mode) | The Docker networking mode to use for the containers in the task. The valid values are none, bridge, awsvpc, and host. (REQUIRED IF 'LAUNCH\_TYPE' IS FARGATE) | `any` | `null` | no |
+| <a name="input_rule_enabled"></a> [rule\_enabled](#input\_rule\_enabled) | Whether the rule should be enabled | `bool` | `true` | no |
+| <a name="input_schedule_expression"></a> [schedule\_expression](#input\_schedule\_expression) | Cron expression | `any` | n/a | yes |
+| <a name="input_service_role_arn"></a> [service\_role\_arn](#input\_service\_role\_arn) | Existing service role ARN created by ECS cluster module | `any` | n/a | yes |
+| <a name="input_ssm_variables"></a> [ssm\_variables](#input\_ssm\_variables) | Map of variables and SSM locations to add to the task definition | `map(string)` | `{}` | no |
+| <a name="input_static_variables"></a> [static\_variables](#input\_static\_variables) | Map of variables and static values to add to the task definition | `map(string)` | `{}` | no |
+| <a name="input_task_role_arn"></a> [task\_role\_arn](#input\_task\_role\_arn) | Existing task role ARN created by ECS cluster module | `any` | n/a | yes |
+| <a name="input_ulimits"></a> [ulimits](#input\_ulimits) | Container ulimit settings. This is a list of maps, where each map should contain "name", "hardLimit" and "softLimit" | <pre>list(object({<br>    name      = string<br>    hardLimit = number<br>    softLimit = number<br>  }))</pre> | `null` | no |
+| <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | VPC ID to deploy this app to | `any` | n/a | yes |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_aws_cloudwatch_log_group_arn"></a> [aws\_cloudwatch\_log\_group\_arn](#output\_aws\_cloudwatch\_log\_group\_arn) | n/a |
+<!-- END_TF_DOCS -->

@@ -100,3 +100,33 @@ variable "command" {
   default     = null
   description = "The command passed to the container, exec form (e.g. [\"node\", \"dist/scripts/run.js\"]). Overrides the Docker image's default CMD. Leave unset to use the image's default command."
 }
+
+variable "efs_mapping" {
+  type        = map(string)
+  description = "A map of EFS filesystem ids to container mount paths, e.g. { fs-0abc123 = \"/opt/airflow/custom_config\" }. Leave empty for no EFS volumes."
+  default     = {}
+}
+
+variable "efs_access_point_path" {
+  type        = string
+  description = "Root directory on the EFS filesystem for this service's access point. Defaults to /<name>. Set it explicitly when several services must share one directory - two services pointing at the same path see the same files."
+  default     = null
+}
+
+variable "efs_access_point_uid" {
+  type        = number
+  description = "Owner uid of the access point root directory. The default of 0 makes the mount read-only for a container running as a non-root user; set it to that user's uid when the container has to write."
+  default     = 0
+}
+
+variable "efs_access_point_gid" {
+  type        = number
+  description = "Owner gid of the access point root directory."
+  default     = 0
+}
+
+variable "efs_access_point_permissions" {
+  type        = string
+  description = "POSIX permissions applied to the access point root directory."
+  default     = "755"
+}

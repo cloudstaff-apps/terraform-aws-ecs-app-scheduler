@@ -30,6 +30,32 @@ resource "aws_ecs_task_definition" "default" {
       secrets     = [for k, v in var.ssm_variables : { name : k, valueFrom : v }]
       environment = [for k, v in var.static_variables : { name : k, value : v }]
       ulimits     = var.ulimits
+
+      # Every entry in efs_mapping is mounted, not just the first one.
+      mountPoints = length(var.efs_mapping) == 0 ? null : [
+        for fs_id, mount_path in var.efs_mapping : {
+          sourceVolume  = "efs-${fs_id}"
+          containerPath = mount_path
+          readOnly      = false
+        }
+      ]
     }
   ])
+
+  dynamic "volume" {
+    for_each = var.efs_mapping
+
+    content {
+      name = "efs-${volume.key}"
+
+      efs_volume_configuration {
+        file_system_id     = volume.key
+        transit_encryption = "ENABLED"
+
+        authorization_config {
+          access_point_id = aws_efs_access_point.default[volume.key].id
+        }
+      }
+    }
+  }
 }
